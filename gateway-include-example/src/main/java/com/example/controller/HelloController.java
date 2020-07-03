@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
+ * 学习响应式编程再研究 Mono
  * @author Fatal
  * @date 2020/7/2 0002 23:00
  */
