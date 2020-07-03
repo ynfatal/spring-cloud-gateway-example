@@ -11,6 +11,7 @@
 
     <modules>
         <module>gateway-eureka-server</module>
+        <module>gateway-include-example</module>
     </modules>
 
     <properties>
