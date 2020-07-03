@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    gateway:
+      # 该示例使用了两个参数定义 Cookie Route Predicate Factory(Cookie 路由谓词工厂)，即 Cookie 名称为 mycookie ，值为 mycookievalue。
+      routes:
+        ###################### 快捷方式 ######################
+        # 快捷方式由 过滤器名称、等号（=）和逗号（,）分隔的参数值识别
+        - id: after_route
+          uri: https://example.org
+          predicates:
+            - Cookie=mycookie,mycookievalue
+        ################### 完全展开参数方式 ###################
+        # 完全展开参数方式看起来更像具有 名称/值对 的标准yaml配置。通常，会有一个名称键和一个args键，
+        # args键是用于配置 predicate(谓词) 或 filter(过滤器) 的键值对映射。
+        # 上面所示的 Cookie 谓词的快捷配置的完整配置如下：
+#        - id: after_route
+#          uri: https://example.org
+#          predicates:
+#            - name: Cookie
+#            - args:
+#                name: mycookie
+#                regexp: mycookievalue

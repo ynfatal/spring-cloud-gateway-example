@@ -12,6 +12,7 @@
     <modules>
         <module>gateway-eureka-server</module>
         <module>gateway-include-example</module>
+        <module>gateway-example4</module>
     </modules>
 
     <properties>
