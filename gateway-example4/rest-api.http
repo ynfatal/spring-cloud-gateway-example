@@ -1,0 +1,6 @@
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Cookie: mycookie=mycookievalue
+
+###

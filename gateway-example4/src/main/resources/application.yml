@@ -6,7 +6,7 @@ spring:
         ###################### 快捷方式 ######################
         # 快捷方式由 过滤器名称、等号（=）和逗号（,）分隔的参数值识别
         - id: after_route
-          uri: https://example.org
+          uri: http://httpbin.org:80
           predicates:
             - Cookie=mycookie,mycookievalue
         ################### 完全展开参数方式 ###################
@@ -14,7 +14,7 @@ spring:
         # args键是用于配置 predicate(谓词) 或 filter(过滤器) 的键值对映射。
         # 上面所示的 Cookie 谓词的快捷配置的完整配置如下：
 #        - id: after_route
-#          uri: https://example.org
+#          uri: http://httpbin.org:80
 #          predicates:
 #            - name: Cookie
 #            - args:
