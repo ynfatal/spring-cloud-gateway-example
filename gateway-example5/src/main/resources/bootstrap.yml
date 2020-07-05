@@ -23,7 +23,7 @@ spring:
 ---
 ################    The Before Route Predicate Factory   ################
 # Before Route Predicate Factory 接收一个参数 datetime（它是 java.time.ZonedDateTime）。
-# 此谓词匹配发生在指定时间之后的请求。下面的示例配置了一个 Before Route Predicate：
+# 此谓词匹配发生在指定时间之前的请求。下面的示例配置了一个 Before Route Predicate：
 spring:
   cloud:
     gateway:
