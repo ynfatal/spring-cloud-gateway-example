@@ -156,7 +156,7 @@ spring:
 
 ---
 ################    The Weight Route Predicate Factory   ################
-# Weight Route Predicate Factory 接收两个参数：组和权重（int）。权重按组计算。
+# Weight Route Predicate Factory 接收两个参数：组和权重（int）。权重按组计算。没分组就按顺序匹配，顺序决定优先级。
 # 下面的示例配置了 Weight Route Predicate：
 spring:
   profiles: weight_route
