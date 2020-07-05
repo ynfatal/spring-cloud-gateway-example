@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: fully_expanded_arguments
+    active: shortcut
 
 ---
 ###################### 快捷方式 ######################
@@ -12,7 +12,10 @@ spring:
     gateway:
       routes:
         - id: after_route
+          # uri 只取到端口号，所以下边测试结果都一样（待研究）
           uri: http://httpbin.org:80
+#          uri: http://httpbin.org:80/get
+#          uri: http://httpbin.org:80/get11111111/1111111
           predicates:
             - Cookie=mycookie,mycookievalue
 

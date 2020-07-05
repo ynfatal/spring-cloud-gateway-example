@@ -35,7 +35,8 @@ public class GatewayConfiguration {
                 .path("/get")
                 .filters(f -> f.addRequestHeader("Hello", "World"))
                 .uri(HTTP_URI)
-            ).route(p -> p
+            )
+            .route(p -> p
                 .host("*.hystrix.com")
                 .filters(f -> f
                     .hystrix(config -> config
