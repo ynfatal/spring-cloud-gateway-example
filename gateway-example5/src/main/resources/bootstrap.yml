@@ -1,0 +1,34 @@
+# Spring Cloud Gateway 将路由匹配作为 Spring WebFlux HandlerMapping 基础设施的一部分。
+# Spring Cloud Gateway 包含了许多内置的 route predicate factory(路由谓词工厂)。这些谓词
+# 都匹配 HTTP请求 的不同属性。你可以使用逻辑和语句组合多个路由谓词工厂。
+spring:
+  profiles:
+    active: before_route
+
+---
+################    The After Route Predicate Factory   ################
+# After Route Predicate Factory 接收一个参数 datetime（它是 java.time.ZonedDateTime）。
+# 此谓词匹配发生在指定时间之后的请求。下面的示例配置了一个 After Route Predicate：
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: after_route
+          uri: http://httpbin.org:80
+          predicates:
+            # 这个时间的格式打印 ZonedDateTime.now() 然后拿过来
+            - After=2020-07-05T09:28:13.128+08:00[Asia/Shanghai]
+#            - After=2021-07-05T09:28:13.128+08:00[Asia/Shanghai]
+
+---
+################    The Before Route Predicate Factory   ################
+# Before Route Predicate Factory 接收一个参数 datetime（它是 java.time.ZonedDateTime）。
+# 此谓词匹配发生在指定时间之后的请求。下面的示例配置了一个 Before Route Predicate：
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: before_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Before=2020-07-06T09:28:13.128+08:00[Asia/Shanghai]
