@@ -11,7 +11,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: after_route
+        - id: route
           # uri 只取到端口号，所以下边测试结果都一样（待研究）
           uri: http://httpbin.org:80
 #          uri: http://httpbin.org:80/get
@@ -29,7 +29,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: after_route
+        - id: route
           uri: http://httpbin.org:80
           predicates:
             - name: Cookie
