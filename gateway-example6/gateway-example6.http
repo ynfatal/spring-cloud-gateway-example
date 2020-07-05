@@ -1,0 +1,11 @@
+### the test for addRequestHeader
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET http://localhost:8080/red/1
+Accept: */*
+Cache-Control: no-cache
+
+###
