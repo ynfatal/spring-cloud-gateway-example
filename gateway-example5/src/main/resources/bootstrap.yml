@@ -3,13 +3,14 @@
 # 都匹配 HTTP请求 的不同属性。你可以使用逻辑和语句组合多个路由谓词工厂。
 spring:
   profiles:
-    active: before_route
+    active: weight_route
 
 ---
 ################    The After Route Predicate Factory   ################
 # After Route Predicate Factory 接收一个参数 datetime（它是 java.time.ZonedDateTime）。
 # 此谓词匹配发生在指定时间之后的请求。下面的示例配置了一个 After Route Predicate：
 spring:
+  profiles: after_route
   cloud:
     gateway:
       routes:
@@ -25,6 +26,7 @@ spring:
 # Before Route Predicate Factory 接收一个参数 datetime（它是 java.time.ZonedDateTime）。
 # 此谓词匹配发生在指定时间之前的请求。下面的示例配置了一个 Before Route Predicate：
 spring:
+  profiles: before_route
   cloud:
     gateway:
       routes:
@@ -32,3 +34,141 @@ spring:
           uri: http://httpbin.org:80
           predicates:
             - Before=2020-07-06T09:28:13.128+08:00[Asia/Shanghai]
+
+---
+################    The Between Route Predicate Factory   ################
+# Between Route Predicate Factory 接收两个参数 datetime1 和 datetime2（它们都是 java.time.ZonedDateTime）。
+# 此谓词匹配发生在 datetime1 和 datetime2 之间的请求。下面的示例配置了一个 Between Route Predicate：
+spring:
+  profiles: between_route
+  cloud:
+    gateway:
+      routes:
+        - id: between_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Between=2020-07-05T09:28:13.128+08:00[Asia/Shanghai], 2020-07-06T09:28:13.128+08:00[Asia/Shanghai]
+
+---
+################    The Cookie Route Predicate Factory   ################
+# Cookie Route Predicate Factory 接收两个参数 cookie名称 和 regexp（一个Java正则表达式）。
+# 此谓词匹配具有指定名称并且其值匹配正则表达式的 cookie。下面的示例配置了一个 Cookie Route Predicate：
+spring:
+  profiles: cookie_route
+  cloud:
+    gateway:
+      routes:
+        - id: cookie_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Cookie=chocolate, ch.p
+            - Cookie=fatal, \d{2}
+
+---
+################    The Header Route Predicate Factory   ################
+# Header Router Predicate Factory 接收两个参数 header名称 和 regexp（一个Java正则表达式）。
+# 此谓词匹配具有指定名称并且其值匹配正则表达式的 header。下面的示例配置了一个 Header Route Predicate：
+spring:
+  profiles: header_route
+  cloud:
+    gateway:
+      routes:
+        - id: header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Header=X-Request-Id, \d+
+
+---
+################    The Host Route Predicate Factory   ################
+# Host Route Predicate Factory 接收一个参数：主机名模式的列表。该模式使用“.”作为分隔符的 ant风格模式。
+# 此谓词匹配与模式匹配的 Host header。下面的示例配置了一个 Host Route Predicate：
+spring:
+  profiles: host_route
+  cloud:
+    gateway:
+      routes:
+        - id: host_route
+          uri: http://httpbin.org:80
+          predicates:
+            # 列表的不能像 Cookie 和 Header 那样写成两行
+            - Host=**.somehost.org, **.anotherhost.org, **.fatal.com
+
+---
+################    The Method Route Predicate Factory   ################
+# Method Route Predicate Factory 接收一个参数：HTTP请求类型列表。
+# 下面的示例配置了一个 Method Route Predicate：
+spring:
+  profiles: method_route
+  cloud:
+    gateway:
+      routes:
+        - id: method_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Method=GET, POST, DELETE
+
+---
+################    The Path Route Predicate Factory   ################
+# Path Route Predicate Factory 接收两个参数： Spring PathMatcher列表 和 一个称为 matchOptionalTrailingSeparator 的可选标志。
+# 下面的示例配置了一个 Path Route Predicate：
+spring:
+  profiles: path_route
+  cloud:
+    gateway:
+      routes:
+        - id: path_route
+          uri: http://localhost:9090
+          predicates:
+            - Path=/red/{segment},/blue/{segment}
+
+---
+################    The Query Route Predicate Factory   ################
+# Query Route Predicate Factory 接收两个参数，一个是必须的 param（参数名） 和 一个可选的 regexp（一个Java正则表达式）。
+# 此谓词匹配两参数：red 和 blue，并且 blue 的值满足正则表达式（gree.）。下面的示例配置了 Query Route Predicate：
+spring:
+  profiles: query_route
+  cloud:
+    gateway:
+      routes:
+        - id: query_route
+          uri: http://httpbin.org:80
+          predicates:
+            - Query=red
+            # “.”匹配除换行符外的所有单字符
+            - Query=blue, gree.
+
+---
+################    The RemoteAddr Route Predicate Factory   ################
+# RemoteAddr Route Predicate Factory 接收一个源列表（长度最小为1），这些源是 CIDR符号（IPv4或IPv6）字符串，
+# 比如 192.168.0.1/16(其中192.168.0.1是IP地址，16是子网掩码)。下面的示例配置了一个 RemoteAddr Route Predicate：
+spring:
+  profiles: remoteaddr_route
+  cloud:
+    gateway:
+      routes:
+        - id: remoteaddr_route
+          uri: http://httpbin.org:80
+          predicates:
+            # TODO: 24是子网掩码？是位数吧?而且，这数字配多少好像都没影响？
+            - RemoteAddr=192.168.0.1/24
+# 匹配 RemoteAddr 方法：org.springframework.cloud.gateway.handler.predicate.RemoteAddrRoutePredicateFactory.apply
+
+
+---
+################    The Weight Route Predicate Factory   ################
+# Weight Route Predicate Factory 接收两个参数：组和权重（int）。权重按组计算。
+# 下面的示例配置了 Weight Route Predicate：
+spring:
+  profiles: weight_route
+  cloud:
+    gateway:
+      routes:
+        - id: weight_high
+          uri: http://localhost:9090
+          predicates:
+            - Weight=group1, 8
+        - id: weight_low
+          uri: http://localhost:9091
+          predicates:
+            - Weight=group1, 2
+# 这份路由配置会将 80% 的流量转发到 http://localhost:9090，将 20% 的流量转发到 http://localhost:9091

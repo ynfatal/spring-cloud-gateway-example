@@ -1,4 +1,63 @@
-http://localhost:8080/get
+### the test for after before and between
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+
+### the test for cookie
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Cookie: chocolate=ch.p; fatal=22
+
+### the test for header
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+X-Request-Id: 123456
+
+### the test for host
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Host: www.somehost.org
+#Host: www.anotherhost.org
+#Host: www.fatal.com
+
+### the test for method
+// 什么请求类型路由的时候就还是那个请求类型
+GET http://localhost:8080/get
+#POST http://localhost:8080/post
+#DELETE http://localhost:8080/delete
+// PUT 请求方式不拦截，所以404
+#PUT http://localhost:8080/put
+Accept: */*
+Cache-Control: no-cache
+
+### the test for path
+GET http://localhost:8080/red/1
+#GET http://localhost:8080/blue/green
+// 路径不匹配，所以404
+#GET http://localhost:8080/red
+Accept: */*
+Cache-Control: no-cache
+
+### the test for query
+GET http://localhost:8080/get?red=123&blue=green
+#GET http://localhost:8080/get?blue=greet&red=123
+# 少了个 red 参数，所以404
+#GET http://localhost:8080/get?blue=greet
+Accept: */*
+Cache-Control: no-cache
+
+### the test for remoteaddr
+// cmd 后输入 ipconfig 可以得到 RemoteAddr，同一网段可以匹配
+GET http://192.168.0.102:8080/get
+#GET http://192.168.56.1:8080/get
+Accept: */*
+Cache-Control: no-cache
+
+### the test for weight
+GET http://localhost:8080/weight
 Accept: */*
 Cache-Control: no-cache
 
