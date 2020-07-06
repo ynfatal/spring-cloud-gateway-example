@@ -14,16 +14,18 @@ spring:
   cloud:
     gateway:
       routes:
-#        - id: add_request_header_route
-#          uri: http://httpbin.org:80
-#          # 注意：filters 不能单独使用，必须在有 predicates 的前提下。参考属性标注的注解：org.springframework.cloud.gateway.route.RouteDefinition.predicates
-#          predicates:
-#            - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
-#          filters:
-#            - AddRequestHeader=X-Request-Red, blue
+        # 注意：这里是有顺序的。
         - id: add_request_header_route_with_variable
           uri: http://localhost:9090
           predicates:
             - Path=/red/{segment}
           filters:
             - AddRequestHeader=X-Request-Red, Blue-{segment}
+        - id: add_request_header_route
+          uri: http://httpbin.org:80
+          # 注意：filters 不能单独使用，必须在有 predicates 的前提下。参考属性标注的注解：org.springframework.cloud.gateway.route.RouteDefinition.predicates
+          predicates:
+            - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
+          filters:
+            - AddRequestHeader=X-Request-Red, blue
+
