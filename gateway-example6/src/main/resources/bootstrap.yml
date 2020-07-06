@@ -115,3 +115,37 @@ spring:
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_FIRST
 # DedupeResponseHeader 过滤器还接受一个可选的策略参数。接受的值是 RETAIN_FIRST(默认)、RETAIN_LAST 和 RETAIN_UNIQUE。
+# Configuration parameters:
+#  - name
+#      String representing response header names, space separated. Required.
+#  - strategy
+#  	RETAIN_FIRST - 默认，仅保留第一个值。
+#  	RETAIN_LAST - 保留最后一个值。
+#  	RETAIN_UNIQUE - 按首次遇到的顺序保留所有唯一值。（可以有多个但是都是唯一）
+# 详细可以参考：org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory 类上的注释
+# 里边还有例子，可以帮助理解。
+
+---
+#################   The Hystrix GatewayFilter Factory   #################
+# 官网：Netflix 已经将 Hystrix 置于维护状态。我们建议您在 Resilience4J 中使用 Spring Cloud 断路器网关过滤器，因此对 Hystrix 的支持将在未来的版本中删除。
+# 要在项目中启用 Hystrix GatewayFilter 实例，请添加 spring-cloud-starter-netflix-hystrix 的依赖。
+# Hystrix GatewayFilter Factory 接收一个名称参数，即 HystrixCommand 的名称。Hystrix 过滤器还可以接受一个可选的fallbackUri参数。
+# 目前，只支持转发:策划好的 uri。如果调用回退，则请求被转发到与URI匹配的控制器。
+# 下面的示例配置了一个 Hystrix GatewayFilter：
+spring:
+  profiles: hystrix_route
+  cloud:
+    gateway:
+      routes:
+        - id: hystrix_route
+          uri: lb://backing-service:8088
+          predicates:
+            - Path=/consumingserviceendpoint
+          filters:
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/incaseoffailureusethis
+# 当 Hystrix 回退被调用时，它将转发到 /incaseoffailureusethis URI。注意，这个示例还演示了（可选的）Spring Cloud Netflix Ribbon
+# 负载均衡（在目标 URI 上定义 lb 前缀）。
+# 更多示例请看官网
