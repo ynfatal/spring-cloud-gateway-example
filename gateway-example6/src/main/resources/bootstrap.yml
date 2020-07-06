@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: add_request_header_route
+    active: add_request_parameter_route_with_variable
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -14,13 +14,6 @@ spring:
   cloud:
     gateway:
       routes:
-        # 注意：这里是有顺序的。
-        - id: add_request_header_route_with_variable
-          uri: http://localhost:9090
-          predicates:
-            - Path=/red/{segment}
-          filters:
-            - AddRequestHeader=X-Request-Red, Blue-{segment}
         - id: add_request_header_route
           uri: http://httpbin.org:80
           # 注意：filters 不能单独使用，必须在有 predicates 的前提下。参考属性标注的注解：org.springframework.cloud.gateway.route.RouteDefinition.predicates
@@ -29,3 +22,48 @@ spring:
           filters:
             - AddRequestHeader=X-Request-Red, blue
 
+---
+# AddRequestHeader 可以用于识别匹配 Path 或 Host 中的 URI变量。URI变量可以在值中使用，并在运行时展开。
+# 下面的示例配置了一个使用变量的 AddRequestHeader GatewayFilter：
+spring:
+  profiles: add_request_header_route_with_variable
+  cloud:
+    gateway:
+      routes:
+        - id: add_request_header_route_with_variable
+          uri: http://localhost:9090
+          predicates:
+            - Path=/red/{segment}
+          filters:
+            - AddRequestHeader=X-Request-Red, Blue-{segment}
+
+---
+##########   The AddRequestParameter GatewayFilter Factory   ##########
+# AddRequestParameter GatewayFilter Factory 接收一个参数名和一个参数值。下面的示例配置了一个 AddRequestParameter GatewayFilter：
+spring:
+  profiles: add_request_parameter_route
+  cloud:
+    gateway:
+      routes:
+        - id: add_request_parameter_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
+          filters:
+            - AddRequestParameter=color, blue
+            - AddRequestParameter=name, fatal
+
+---
+# AddRequestParameter 可以用于识别 Path 或 Host 中的 URI变量。URI变量可以在值中使用，并在运行时展开。
+## 下面的示例配置了一个使用变量的 AddRequestParameter GatewayFilter：
+spring:
+  profiles: add_request_parameter_route_with_variable
+  cloud:
+    gateway:
+      routes:
+        - id: add_request_parameter_route_with_variable
+          uri: http://httpbin.org:80
+          predicates:
+            - Host=www.{segment}.com
+          filters:
+            - AddRequestParameter=name, {segment}
