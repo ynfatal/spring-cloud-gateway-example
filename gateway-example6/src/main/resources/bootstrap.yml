@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: add_response_header_route
+    active: dedupe_response_header_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -55,7 +55,7 @@ spring:
 
 ---
 # AddRequestParameter 可以用于识别 Path 或 Host 中的 URI变量。URI变量可以在值中使用，并在运行时展开。
-## 下面的示例配置了一个使用变量的 AddRequestParameter GatewayFilter：
+# 下面的示例配置了一个使用变量的 AddRequestParameter GatewayFilter：
 spring:
   profiles: add_request_parameter_route_with_variable
   cloud:
@@ -70,6 +70,8 @@ spring:
 
 ---
 ##########   The AddResponseHeader GatewayFilter Factory   ##########
+# AddResponseHeader GatewayFilter Factory 接收一个参数名和一个参数值。
+# 下面的示例配置了一个 AddResponseHeader GatewayFilter：
 spring:
   profiles: add_response_header_route
   cloud:
@@ -81,3 +83,35 @@ spring:
             - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
           filters:
             - AddResponseHeader=X-Response-Red, Blue
+
+---
+# AddResponseHeader 可以用于识别 Path 或 Host 中的 URI变量。URI变量可以在值中使用，并在运行时展开。
+# 下面的示例配置了一个使用变量的 AddResponseHeader GatewayFilter：
+spring:
+  profiles: add_response_header_route_with_variable
+  cloud:
+    gateway:
+      routes:
+        - id: add_response_header_route_with_variable
+          uri: http://httpbin.org:80
+          predicates:
+            - Host=www.{segment}.com
+          filters:
+            - AddResponseHeader=name, {segment}
+
+---
+##########   The DedupeResponseHeader GatewayFilter Factory   ##########
+# DedupeResponseHeader GatewayFilter 接收一个名称参数和一个可选的策略参数。name 可以包含一个以空格分隔的标题名称列表。
+# 下面的示例配置了一个 DedupeResponseHeader GatewayFilter：
+spring:
+  profiles: dedupe_response_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: dedupe_response_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_FIRST
+# DedupeResponseHeader 过滤器还接受一个可选的策略参数。接受的值是 RETAIN_FIRST(默认)、RETAIN_LAST 和 RETAIN_UNIQUE。
