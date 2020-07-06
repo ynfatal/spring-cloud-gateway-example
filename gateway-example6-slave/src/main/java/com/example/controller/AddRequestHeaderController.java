@@ -1,11 +1,14 @@
 package com.example.controller;
 
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import com.example.vo.HeaderVO;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,9 +21,16 @@ import javax.servlet.http.HttpServletRequest;
 public class AddRequestHeaderController {
 
     @GetMapping("/red/{segment}")
-    public ResponseEntity<String> red(@PathVariable("segment") String segment, HttpServletRequest request) {
-        System.out.println(request.getHeader("X-Request-Red"));
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForEntity("http://httpbin.org:80/get", String.class);
+    public HeaderVO red(HttpServletRequest request) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        Map<String, String> map = new HashMap<>();
+        while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            String values = request.getHeader(name);
+            map.put(name, values);
+        }
+        return new HeaderVO().setHeaders(map.entrySet().stream()
+            .sorted(Entry.comparingByKey())
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> newValue, LinkedHashMap::new)));
     }
 }
