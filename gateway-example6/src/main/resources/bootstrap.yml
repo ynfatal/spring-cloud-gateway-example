@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: add_request_parameter_route_with_variable
+    active: add_response_header_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -67,3 +67,17 @@ spring:
             - Host=www.{segment}.com
           filters:
             - AddRequestParameter=name, {segment}
+
+---
+##########   The AddResponseHeader GatewayFilter Factory   ##########
+spring:
+  profiles: add_response_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: add_response_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
+          filters:
+            - AddResponseHeader=X-Response-Red, Blue

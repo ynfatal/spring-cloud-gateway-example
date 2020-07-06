@@ -8,6 +8,11 @@ Cache-Control: no-cache
 GET http://localhost:8080/get
 Accept: */*
 Cache-Control: no-cache
-Host: www.fatal.com
+#Host: www.fatal.com
+
+### the test for AddResponseHeader
+GET http://localhost:8080/response-headers
+Accept: */*
+Cache-Control: no-cache
 
 ###
