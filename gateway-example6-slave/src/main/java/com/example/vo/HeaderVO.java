@@ -7,7 +7,6 @@ import lombok.experimental.Accessors;
 
 /**
  * @author Fatal
- * @email marongjiang@qingzu.com.cn
  * @date 2020/7/6 8:19
  */
 @Data
