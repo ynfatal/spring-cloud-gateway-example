@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: fallback_headers_route
+    active: prefix_path_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -201,3 +201,40 @@ spring:
               args:
                 executionExceptionTypeHeaderName: Test-Header
 # 在本例中，在运行时断路器发送执行异常后，请求会先被转发到 localhost:8080/fallback，再被路由到 localhost:9090/fallback。
+
+---
+##############  The MapRequestHeader GatewayFilter Factory ##############
+# MapRequestHeader GatewayFilter Factory 接收两个参数：fromHeader 和 toHeader。它会创建一个新的命名的请求头（toHeader），
+# 并从传入的 HTTP 请求的现有命名请求头（fromHeader）中取值。如果输入的命名请求头（指新的）不存在，过滤器不会受影响；如果存在，则使用
+# 新增覆盖旧值。MapRequestHeader 的 map 定义和 java8 的 map 一样，可以理解为改造者嘛。
+# 1. fromHeader 不存在，直接跳过，不走逻辑（不影响使用）。
+# 2. toHeader 不存在，则结果会多一个 header；如果已经存在，新值覆盖旧值（以拼接的方式，使用逗号将新旧值分开）。
+# 具体逻辑请参考源码：org.springframework.cloud.gateway.filter.factory.MapRequestHeaderGatewayFilterFactory.apply
+# 下面的示例配置了一个 MapRequestHeader GatewayFilter:
+spring:
+  profiles: map_request_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: map_request_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
+          filters:
+            - MapRequestHeader=Blue, X-Request-Red # fromHeader 不存在
+            - MapRequestHeader=Host, X-Request-Red # fromHeader 存在，toHeader 不存在
+            - MapRequestHeader=Accept, User-Agent # fromHeader 存在，toHeader 存在
+
+---
+##############  The PrefixPath GatewayFilter Factory ##############
+spring:
+  profiles: prefix_path_route
+  cloud:
+    gateway:
+      routes:
+        - id: prefix_path_route
+          uri: http://localhost:8080
+          predicates:
+            - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
+          filters:
+            - PrefixPath=/mypath

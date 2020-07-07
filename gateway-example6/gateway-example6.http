@@ -34,4 +34,14 @@ GET http://localhost:8080/ingredients/a/b
 Accept: */*
 Cache-Control: no-cache
 
+### the test for MapRequestHeader GatewayFilter
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+
+### the test for PrefixPath GatewayFilter
+GET http://localhost:8080/mypath/hello
+Accept: */*
+Cache-Control: no-cache
+
 ###
