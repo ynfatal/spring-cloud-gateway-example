@@ -16,5 +16,10 @@ spring:
         - id: load_balance_client_route
           # 服务名称不能带下划线，不然源码表达式匹配不了
           uri: lb://fatal-service
+          # 测试 503 和 404
+#          uri: lb://fatal-service2
           predicates:
             - Path=/service/**
+      # 默认情况下，当在 LoadBalance 中找不到服务实例时，将返回 503。通过设置 spring.cloud.gateway.loadbalancer.use404=true，可以将网关配置为返回 404。
+      loadbalancer:
+        use404: true
