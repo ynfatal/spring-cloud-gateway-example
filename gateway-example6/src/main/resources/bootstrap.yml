@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: hystrix_route
+    active: fallback_headers_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -147,7 +147,57 @@ spring:
               args:
                 name: fallbackcmd
                 fallbackUri: forward:/incaseoffailureusethis
-      loadbalancer:
-        use404: true
 # 当 Hystrix 回退被调用时，它将转发到 /incaseoffailureusethis URI。
 # 更多示例请看官网
+
+---
+############## Spring Cloud CircuitBreaker GatewayFilter Factory ##############
+# Spring Cloud CircuitBreaker GatewayFilter Factory 使用 Spring Cloud CircuitBreaker APIs 将网关路由封装在
+# 断路器中。Spring Cloud CircuitBreaker 支持两个能与 Spring Cloud Gateway 一起使用的库：Hystrix 和 Resilience4J。
+# Netflix 已经将 Hystrix 置于仅维护模式，所以我们建议您使用 Resilience4J。
+# 要启用 Spring Cloud CircuitBreaker filter，需要在类路径上放 spring-cloud-starter-circuitbreaker-reactor-resilience4j
+# 或者 spring-cloud-starter-netflix-hystrix。
+# 下面的示例配置类一个 Spring Cloud CircuitBreaker：
+spring:
+  profiles: circuit_breaker_route
+  cloud:
+    gateway:
+      routes:
+        - id: circuit_breaker_route
+          uri: http://localhost:8787
+          predicates:
+            - Path=/consumingserviceendpoint
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: myCircuitBreaker
+                # 如果调用回退，则请求被转发到与URI(/incaseoffailureusethis)匹配的控制器。
+                fallbackUri: forward:/incaseoffailureusethis
+
+---
+##############  The FallbackHeaders GatewayFilter Factory ##############
+# FallbackHeaders Factory 允许您在转发到外部应用程序的 fallbackUri 的请求头中添加 Hystrix 或
+# Spring Cloud CircuitBreaker 的执行异常细节。如下面的场景：
+spring:
+  profiles: fallback_headers_route
+  cloud:
+    gateway:
+      routes:
+        - id: ingredients
+          uri: http://localhost:8787
+          predicates:
+          - Path=/ingredients/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: fetchIngredients
+                fallbackUri: forward:/fallback
+        - id: ingredients_fallback
+          uri: http://localhost:9090
+          predicates:
+            - Path=/fallback
+          filters:
+            - name: FallbackHeaders
+              args:
+                executionExceptionTypeHeaderName: Test-Header
+# 在本例中，在运行时断路器发送执行异常后，请求会先被转发到 localhost:8080/fallback，再被路由到 localhost:9090/fallback。

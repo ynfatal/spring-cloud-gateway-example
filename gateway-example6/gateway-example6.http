@@ -24,8 +24,13 @@ GET http://localhost:8080/response-headers
 Accept: */*
 Cache-Control: no-cache
 
-### the test for Hystrix GatewayFilter
+### the test for Hystrix GatewayFilter and CircuitBreaker GatewayFilter
 GET http://localhost:8080/consumingserviceendpoint
+Accept: */*
+Cache-Control: no-cache
+
+### the test for FallbackHeaders GatewayFilter
+GET http://localhost:8080/ingredients/a/b
 Accept: */*
 Cache-Control: no-cache
 

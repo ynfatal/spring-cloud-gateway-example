@@ -18,19 +18,10 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2020/7/6 0006 5:37
  */
 @RestController
-public class AddRequestHeaderController {
+public class AddRequestHeaderController extends BaseController {
 
     @GetMapping("/red/{segment}")
     public HeaderVO red(HttpServletRequest request) {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        Map<String, String> map = new HashMap<>();
-        while (headerNames.hasMoreElements()) {
-            String name = headerNames.nextElement();
-            String values = request.getHeader(name);
-            map.put(name, values);
-        }
-        return new HeaderVO().setHeaders(map.entrySet().stream()
-            .sorted(Entry.comparingByKey())
-            .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldValue, newValue) -> newValue, LinkedHashMap::new)));
+        return super.headers(request);
     }
 }
