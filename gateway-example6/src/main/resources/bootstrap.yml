@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: dedupe_response_header_route
+    active: hystrix_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -138,8 +138,8 @@ spring:
     gateway:
       routes:
         - id: hystrix_route
-          # 负载均衡参考 7.3 -> https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.2.RELEASE/reference/html/#the-loadbalancerclient-filter
-          uri: lb://backing-service:8088
+          # 指定一个不存在的服务实例
+          uri: http://localhost:8787
           predicates:
             - Path=/consumingserviceendpoint
           filters:
@@ -147,6 +147,7 @@ spring:
               args:
                 name: fallbackcmd
                 fallbackUri: forward:/incaseoffailureusethis
-# 当 Hystrix 回退被调用时，它将转发到 /incaseoffailureusethis URI。注意，这个示例还演示了（可选的）Spring Cloud Netflix Ribbon
-# 负载均衡（在目标 URI 上定义 lb 前缀）。
+      loadbalancer:
+        use404: true
+# 当 Hystrix 回退被调用时，它将转发到 /incaseoffailureusethis URI。
 # 更多示例请看官网
