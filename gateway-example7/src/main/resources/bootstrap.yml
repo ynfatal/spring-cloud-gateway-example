@@ -5,7 +5,7 @@ spring:
 ##############  The LoadBalancerClient Filter  ##############
 # LoadBalancerClientFilter 在名为 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 的交换属性中查找 URI。如果 URL 有一个 lb 方案
 #（比如：lb://myservice），它使用 Spring Cloud LoadBalancerClient 将名称（在本例中是 fatal-service）解析为一个实际的主机和端口，
-# 并替换相同属性的 URI。为修改的原始 URL 被附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。过滤器还会
+# 并替换相同属性的 URI。未修改的原始 URL 被附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。过滤器还会
 # 查看 ServerWebExchangeUtils.GATEWAY_SCHEME_PREFIX_ATTR 属性是否等于 lb。如果是，则应用相同的规则。
 # 下面的示例配置了一个 LoadBalancerClientFilter：
 spring:
