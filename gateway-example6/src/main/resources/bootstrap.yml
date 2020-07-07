@@ -138,6 +138,7 @@ spring:
     gateway:
       routes:
         - id: hystrix_route
+          # 负载均衡参考 7.3 -> https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.2.RELEASE/reference/html/#the-loadbalancerclient-filter
           uri: lb://backing-service:8088
           predicates:
             - Path=/consumingserviceendpoint
