@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: prefix_path_route
+    active: preserve_host_header_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -239,3 +239,63 @@ spring:
             - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
           filters:
             - PrefixPath=/mypath
+
+---
+##############  The PreserveHostHeader GatewayFilter Factory  ##############
+# PreserveHostHeader GatewayFilter Factory 没有参数。此过滤器设置一个路由过滤器检查的请求属性，以确定是否应该发送
+# 原始 host header，而不是 HTTP 客户端确定的 host header。（默认 true，没得选）
+# 不理解的话看源码 org.springframework.cloud.gateway.filter.factory.PreserveHostHeaderGatewayFilterFactory.apply(java.lang.Object)
+# 下面的示例配置了一个 PreserveHostHeader GatewayFilter：
+spring:
+  profiles: preserve_host_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: preserve_host_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
+          filters:
+            - PreserveHostHeader
+
+---
+##############  The RequestRateLimiter GatewayFilter Factory  ##############
+# RequestRateLimiter GatewayFilter Factory 使用 RateLimiter 来确定当前请求是否允许继续。如果不允许，则默认返回 429（过多请求） 状态码。
+# 此过滤器接收一个可选参的 keyResolver参数 和 针对限制速率器的参数。（后面将描述）
+# keyResolver 是一个实现 KeyResolver 接口的 bean。在配置中，使用 SpELl 表达式按名称引用 bean。`#{@mykeysolver}` 是一个引用名为 mykeysolver 的 bean 的 SpEL 表达式。
+# KeyResolver 接口允许可插拔策略获得用于限制请求的密钥。在为了的里程碑版本中，将有一些 keyResolver 实现。
+# KeyResolver 的默认实现是 PrincipalNameKeyResolver，它从 ServerWebExchange 检索 Principal 并调用 Principal.getName()。
+#   默认情况下，如果 keyResolver 找不到密钥，那么拒绝请求（返回 429）。可以通过设置 spring.cloud.gateway.filter.request-rate-limiter.deny-empty-key (true or false)
+#   和 spring.cloud.gateway.filter.request-rate-limiter.empty-key-status-code 来调整这种行为。
+# 下面的示例是无效的配置方式，RequestRateLimiter 不支持快捷配置。
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: invalid_shortcut_configuration
+#          filters:
+#            RequestRateLimiter=2, 2, #{@userkeyresolver}
+##################    The Redis RateLimiter  ###################
+# RedisRateLimiter 的实现是基于 Stripe 完成的工作。它需要使用 `spring-boot-starter-data-redis-reactive` Spring Boot 启动器。
+# 使用的算法是令牌通算法。
+spring:
+  profiles: request_rate_limiter_route
+  cloud:
+    gateway:
+      routes:
+        - id: request_rate_limiter_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
+          filters:
+            - name: RequestRateLimiter
+              args:
+                # 允许用户每秒执行的请求数，而不删除任何请求。这是填充令牌桶的速率。
+                redis-rate-limiter.replenishRate: 10
+                # 允许用户在一秒内执行的最大请求数。这是令牌桶可以容纳的令牌数，将此值设置为 0 可以阻止所有请求。
+                redis-rate-limiter.burstCapacity: 20
+                # 请求花费的令牌数。这是每个请求从桶中获取的令牌数，默认为 1。
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userKeyResolver}"
+# 注意：RequestRateLimiter 不支持快捷配置方式
+
