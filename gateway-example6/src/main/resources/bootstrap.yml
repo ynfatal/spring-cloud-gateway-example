@@ -302,7 +302,7 @@ spring:
                 redis-rate-limiter.requestedTokens: 60
                 # 使用 SpEL 表达式从 Spring 容器中获取引用名为 pathKeyResolver 的 bean
                 key-resolver: "#{@pathKeyResolver}"
-#                rate-limiter: "#{@redisRateLimiter}"
+#                rate-limiter: "#{@redisRateLimiter}"  # 配置类和全局配置文件两种方式二选一
   redis:
     host: localhost
     password: 123456
