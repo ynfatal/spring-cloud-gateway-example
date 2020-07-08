@@ -227,6 +227,7 @@ spring:
 
 ---
 ##############  The PrefixPath GatewayFilter Factory ##############
+# PrefixPath GatewayFilter 接收一个前缀参数。下面的示例配置了一个 PrefixPath GatewayFilter：
 spring:
   profiles: prefix_path_route
   cloud:

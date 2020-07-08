@@ -109,7 +109,7 @@ spring:
 
 ---
 ################    The Path Route Predicate Factory   ################
-# Path Route Predicate Factory 接收两个参数： Spring PathMatcher列表 和 一个称为 matchOptionalTrailingSeparator 的可选标志。
+# Path Route Predicate Factory 接收两个参数： Spring PathMatcher列表 和 一个称为 matchOptionalTrailingSeparator 的可选标志（这个默认就行）。
 # 下面的示例配置了一个 Path Route Predicate：
 spring:
   profiles: path_route
