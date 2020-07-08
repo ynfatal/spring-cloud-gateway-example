@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: preserve_host_header_route
+    active: request_rate_limiter_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -277,7 +277,13 @@ spring:
 #            RequestRateLimiter=2, 2, #{@userkeyresolver}
 ##################    The Redis RateLimiter  ###################
 # RedisRateLimiter 的实现是基于 Stripe 完成的工作。它需要使用 `spring-boot-starter-data-redis-reactive` Spring Boot 启动器。
-# 使用的算法是令牌通算法。
+# 使用的算法是令牌通算法。参数含义如下：
+# redis-rate-limiter.replenishRate：允许用户每秒执行的请求数，而不删除任何请求。这是填充令牌桶的速率。
+# redis-rate-limiter.burstCapacity：允许用户在一秒内执行的最大请求数。这是令牌桶可以容纳的令牌数，将此值设置为 0 可以阻止所有请求。
+# redis-rate-limiter.requestedTokens：请求花费的令牌数。这是每个请求从桶中获取的令牌数，默认为 1。
+# 设置 replenishRate 和 burstCapacity 具有相同的值可以实现稳定的速率。设置 burstCapacity 的值设高于 replenishRate 可以允许临时爆发。
+# 在这种情况下，速率限制器需要在突发之间留出一段时间（根据 replenishRate），因为两个连续的突发将导致请求丢失（HTTP 429 - 请求太多）。
+# 下面的示例配置了一个 redis-rate-limiter：
 spring:
   profiles: request_rate_limiter_route
   cloud:
@@ -290,12 +296,7 @@ spring:
           filters:
             - name: RequestRateLimiter
               args:
-                # 允许用户每秒执行的请求数，而不删除任何请求。这是填充令牌桶的速率。
                 redis-rate-limiter.replenishRate: 10
-                # 允许用户在一秒内执行的最大请求数。这是令牌桶可以容纳的令牌数，将此值设置为 0 可以阻止所有请求。
                 redis-rate-limiter.burstCapacity: 20
-                # 请求花费的令牌数。这是每个请求从桶中获取的令牌数，默认为 1。
                 redis-rate-limiter.requestedTokens: 1
-                key-resolver: "#{@userKeyResolver}"
-# 注意：RequestRateLimiter 不支持快捷配置方式
-
+#                key-resolver: "#{@userKeyResolver}"
