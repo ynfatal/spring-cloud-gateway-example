@@ -19,7 +19,7 @@ Cache-Control: no-cache
 // 打开注释测试第二组
 #Host: www.fatal.com
 
-### the test for DedupeResponseHeader
+### the test for DedupeResponseHeader GatewayFilter and RemoveResponseHeader GatewayFilter
 GET http://localhost:8080/response-headers
 Accept: */*
 Cache-Control: no-cache
@@ -41,6 +41,11 @@ Cache-Control: no-cache
 
 ### the test for PrefixPath GatewayFilter
 GET http://localhost:8080/mypath/hello
+Accept: */*
+Cache-Control: no-cache
+
+### the test for RemoveRequestParameter GatewayFilter
+GET http://localhost:8080/remove-request-parameter?name=fatal
 Accept: */*
 Cache-Control: no-cache
 
