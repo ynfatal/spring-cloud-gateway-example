@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: redirect_to_route
+    active: remove_request_header_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -314,6 +314,9 @@ spring:
 
 ---
 ##############  The RedirectTo GatewayFilter Factory  ##############
+# RedirectTo GatewayFilter Factory 接收两个参数：status 和 url。status 参数应该是 300 系列的重定向状态码，例如 301。url 参数
+# 应该是一个有效的 url。对于重定向，应该使用 `uri: no://op` 作为重定向的 uri。
+# 下面的示例配置了一个 RedirectTo GatewayFilter：
 spring:
   profiles: redirect_to_route
   cloud:
@@ -325,3 +328,20 @@ spring:
             - After=2020-07-09T08:29:13.128+08:00[Asia/Shanghai]
           filters:
             - RedirectTo=302, http://localhost:8080/request-to
+
+---
+##############  The RemoveRequestHeader GatewayFilter Factory  ##############
+# RemoveRequestHeader GatewayFilter Factory 接收一个参数，它是要删除的 header 的名称。
+# 下面的示例配置了一个 RemoveRequestHeader GatewayFilter：
+spring:
+  profiles: remove_request_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: remove_request_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
+          filters:
+            - RemoveRequestHeader=X-Request-Foo
+# 在发送到下游之前删除 X-Request-Foo header。
