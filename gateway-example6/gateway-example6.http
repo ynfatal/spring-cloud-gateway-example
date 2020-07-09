@@ -49,7 +49,7 @@ GET http://localhost:8080/remove-request-parameter?name=fatal
 Accept: */*
 Cache-Control: no-cache
 
-###
+### the test for RewritePath GatewayFilter
 GET http://localhost:8080/foo/red/blue
 Accept: */*
 Cache-Control: no-cache
