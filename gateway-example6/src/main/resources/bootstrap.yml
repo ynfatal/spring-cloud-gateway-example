@@ -285,6 +285,9 @@ spring:
 # 设置 replenishRate 和 burstCapacity 具有相同的值可以实现稳定的速率。设置 burstCapacity 的值设高于 replenishRate 可以允许临时爆发。
 # 在这种情况下，速率限制器需要在突发之间留出一段时间（根据 replenishRate），因为两个连续的突发将导致部分请求丢失（HTTP 429 - 请求太多）。
 # 设置三个属性为 replenishRate=1, requestedTokens=60 和 burstCapacity=60 将导致每秒只能执行一个请求。
+# 配置的书写方法可以参考：
+#  - https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.2.RELEASE/reference/html/#the-requestratelimiter-gatewayfilter-factory
+#  - https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-core/src/test/resources/application-redis-rate-limiter-config.yml
 # 下面的示例配置了一个 redis-rate-limiter：
 spring:
   profiles: request_rate_limiter_route
