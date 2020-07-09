@@ -307,3 +307,7 @@ spring:
     host: localhost
     password: 123456
 # 这定义了每个用户被允许每秒执行 1 个请求。允许突发 60 个，但在接下来的 1 秒内，只有 1 个请求可用。
+# 相关类可以看这里：
+# - org.springframework.cloud.gateway.config.GatewayRedisAutoConfiguration
+# - org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter
+# 执行的 Redis LUA 脚本文件为：request_rate_limiter。（复制文件名双击 Shift 键即可找到位置）
