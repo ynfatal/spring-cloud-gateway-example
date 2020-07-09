@@ -40,7 +40,7 @@ Accept: */*
 Cache-Control: no-cache
 
 ### the test for PrefixPath GatewayFilter
-GET http://localhost:8080/mypath/hello
+GET http://localhost:8080/hello
 Accept: */*
 Cache-Control: no-cache
 

@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: remove_request_header_route
+    active: prefix_path_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -234,11 +234,12 @@ spring:
     gateway:
       routes:
         - id: prefix_path_route
-          uri: http://localhost:8080
+          uri: http://localhost:9090
           predicates:
             - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
           filters:
             - PrefixPath=/mypath
+# 会为进入该路由的请求添加前缀 /mypath，例如：http://localhost:8080/hello -> http://localhost:8080/mypath/hello
 
 ---
 ##############  The PreserveHostHeader GatewayFilter Factory  ##############
