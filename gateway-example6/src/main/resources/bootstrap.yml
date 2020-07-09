@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: request_rate_limiter_route
+    active: redirect_to_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -311,3 +311,17 @@ spring:
 # - org.springframework.cloud.gateway.config.GatewayRedisAutoConfiguration
 # - org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter
 # 执行的 Redis LUA 脚本文件为：request_rate_limiter。（复制文件名双击 Shift 键即可找到位置）
+
+---
+##############  The RedirectTo GatewayFilter Factory  ##############
+spring:
+  profiles: redirect_to_route
+  cloud:
+    gateway:
+      routes:
+        - id: redirect_to_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-09T08:29:13.128+08:00[Asia/Shanghai]
+          filters:
+            - RedirectTo=302, http://localhost:8080/request-to
