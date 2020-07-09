@@ -346,3 +346,5 @@ spring:
             - RemoveRequestHeader=X-Request-Foo
             - RemoveRequestHeader=Accept-Encoding
 # 在发送到下游之前删除 X-Request-Foo 和 Accept-Encoding 两个 header。
+# 注：只能删除上游的，可以 debug 方法 org.springframework.cloud.gateway.filter.GatewayFilter.filter 看看，exchange -> request -> headers。
+# 不过有部分是默认的 header，删了也会被加回来，例如 Accept。
