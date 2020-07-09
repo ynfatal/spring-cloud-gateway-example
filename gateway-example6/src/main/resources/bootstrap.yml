@@ -344,4 +344,5 @@ spring:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
             - RemoveRequestHeader=X-Request-Foo
-# 在发送到下游之前删除 X-Request-Foo header。
+            - RemoveRequestHeader=Accept-Encoding
+# 在发送到下游之前删除 X-Request-Foo 和 Accept-Encoding 两个 header。

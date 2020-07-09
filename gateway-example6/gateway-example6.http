@@ -34,7 +34,7 @@ GET http://localhost:8080/ingredients/a/b
 Accept: */*
 Cache-Control: no-cache
 
-### the test for MapRequestHeader GatewayFilter, PreserveHostHeader GatewayFilter, RequestRateLimiter GatewayFilter and RedirectTo GatewayFilter
+### the test for MapRequestHeader GatewayFilter, PreserveHostHeader GatewayFilter, RequestRateLimiter GatewayFilter, RemoveRequestHeader GatewayFilter and RedirectTo GatewayFilter
 GET http://localhost:8080/get
 Accept: */*
 Cache-Control: no-cache
