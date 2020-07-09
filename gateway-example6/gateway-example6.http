@@ -50,3 +50,8 @@ Accept: */*
 Cache-Control: no-cache
 
 ###
+GET http://localhost:8080/foo/red/blue
+Accept: */*
+Cache-Control: no-cache
+
+###

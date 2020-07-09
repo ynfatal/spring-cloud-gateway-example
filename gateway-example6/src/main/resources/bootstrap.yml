@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: prefix_path_route
+    active: rewrite_path_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -387,8 +387,22 @@ spring:
             - RemoveRequestParameter=name
 
 
-
-
+---
+##############  The RewritePath GatewayFilter Factory  ##############
+# RewritePath GatewayFilter Factory 接收一个 路径regexp参数 和一个 替换参数。它使用 Java正则表达式 灵活地
+# 重写请求路径。下面的示例配置了一个 RewritePath GatewayFilter：
+spring:
+  profiles: rewrite_path_route
+  cloud:
+    gateway:
+      routes:
+        - id: rewrite_path_route
+          uri: http://localhost:9090
+          predicates:
+            - Path=/foo/**
+          filters:
+            - RewritePath=/red(?<segment>/?.*), $\{segment}
+# 对于 /red/blue 的请求路径，该路由会在发出下游请求之前将路径改为 /blue。注意，由于 yaml 的规范，$ 应该替换为 $\。
 
 
 
