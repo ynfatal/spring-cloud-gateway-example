@@ -460,6 +460,9 @@ spring:
 
 ---
 ##############  The SaveSession GatewayFilter Factory  ##############
+# SaveSession GatewayFilter Factory 在向下游转发调用之前强制执行了 WebSession#save() 操作。过滤器对于 WebSession
+# （例如：Spring Session Mongodb）惰性和远程调用之前需要先执行 WebSession#save() 方法的情况非常有用。
+# 下面的示例配置了一个 SaveSession GatewayFilter：
 spring:
   profiles: save_session_route
   cloud:
@@ -471,7 +474,7 @@ spring:
             - Path=/get
           filters:
             - SaveSession
-
+# 如果你将 Spring Security 和 Spring Session 集成，并且希望确保安全细节已转发到远程进程，那么这一点至关重要。
 
 
 
