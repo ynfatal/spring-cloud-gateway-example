@@ -62,4 +62,9 @@ Accept: */*
 Cache-Control: no-cache
 Host: www.rewriteresponseheader.org
 
+### the test for SetPath GatewayFilter
+GET http://localhost:8080/red/blue
+Accept: */*
+Cache-Control: no-cache
+
 ###

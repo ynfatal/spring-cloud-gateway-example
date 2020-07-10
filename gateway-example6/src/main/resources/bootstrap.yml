@@ -3,9 +3,10 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: secure_headers_route
+    active: prefix_path_route
 test:
   uri: http://httpbin.org:80
+  local: http://localhost:9090
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -33,7 +34,7 @@ spring:
     gateway:
       routes:
         - id: add_request_header_route_with_variable
-          uri: http://localhost:9090
+          uri: ${test.local}
           predicates:
             - Path=/red/{segment}
           filters:
@@ -195,7 +196,7 @@ spring:
                 name: fetchIngredients
                 fallbackUri: forward:/fallback
         - id: ingredients_fallback
-          uri: http://localhost:9090
+          uri: ${test.local}
           predicates:
             - Path=/fallback
           filters:
@@ -236,7 +237,7 @@ spring:
     gateway:
       routes:
         - id: prefix_path_route
-          uri: http://localhost:9090
+          uri: ${test.local}
           predicates:
             - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
           filters:
@@ -386,7 +387,7 @@ spring:
     gateway:
       routes:
         - id: remove_request_parameter_route
-          uri: http://localhost:9090
+          uri: ${test.local}
           predicates:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
@@ -402,7 +403,7 @@ spring:
     gateway:
       routes:
         - id: rewrite_path_route
-          uri: http://localhost:9090
+          uri: ${test.local}
           predicates:
             - Path=/foo/**
           filters:
@@ -501,7 +502,23 @@ spring:
           # 注意：要使用 SecureHeader 的小写全名来禁用它。
           disable: x-frame-options, strict-transport-security
 
-
+---
+##############  The SetPath GatewayFilter Factory  ##############
+# SetPath GatewayFilter Factory 采用了路径模板参数，它提供了一种操作请求路径的简单方法，允许路径模板化片段。
+# 这使用了 Spring 框架的 URI 模板，允许多个匹配段。
+# 下面的示例配置了一个 SetPath GatewayFilter：
+spring:
+  profiles: set_path_route
+  cloud:
+    gateway:
+      routes:
+        - id: set_path_route
+          uri: ${test.local}
+          predicates:
+            - Path=/red/{segment}
+          filters:
+            - SetPath=/{segment}
+# 用于请求路径为 /red/blue，发出下游请求之前将路径设置为 /blue
 
 
 
