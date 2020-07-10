@@ -1,9 +1,9 @@
 # 路由过滤器允许以某种方式修改传入的HTTP请求或传出的HTTP响应。路由过滤器的作用域是特定的路由。
-# Spring Cloud Gateway 包含了许多内置的 GatewayFilter Factory（网关过滤器工厂）。
+# Spring Cloud Gateway 包含了许多内置的 GatewayFilter Factory（网关过滤器工厂）。具体功能可以找相关的工厂类看看。
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: request_rate_limiter_route
+    active: rewrite_location_response_header_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -407,7 +407,32 @@ spring:
             - RewritePath=/red(?<segment>/?.*), $\{segment}
 # 对于 /red/blue 的请求路径，该路由会在发出下游请求之前将路径改为 /blue。注意，由于 yaml 的规范，$ 应该替换为 $\。
 
-
+---
+##############  The RewriteLocationResponseHeader GatewayFilter Factory  ##############
+# RewriteLocationResponseHeader GatewayFilter Factory 修改 Location 响应头的值，通常是为了除去后端特定的详细信息。它接收 stripVersionMode，
+# locationHeaderName，hostValue 和 protocolsRegex 四个参数。
+#  - stripVersionMode 参数的值可以是 NEVER_STRIP，AS_IN_REQUEST（默认）和 ALWAYS_STRIP。
+#      NEVER_STRIP：即使原请求的路径不包含版本，也不会剥离版本。
+#      AS_IN_REQUEST：只有原请求的路径不包含版本时，才会剥离版本。
+#      ALWAYS_STRIP：版本始终被剥离，即使原请求的路径包含版本。
+#  - locationHeaderName：表示自定义的 Location header 名称。默认：Location。
+#  - hostValue：一个字符串。如果提供，将用于替换响应中 Location header 的 host:port 部分。默认：请求中 Host header 的值用于替换。
+#  - protocolsRegex：一个有效的正则表达式字符串，协议名称必须与之匹配。如果不匹配，则过滤器不执行任何操作。默认值为 http|https|ftp|ftps。
+# 下面的示例配置了一个 RewriteLocationResponseHeader GatewayFilter：
+spring:
+  profiles: rewrite_location_response_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: rewrite_location_response_header_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
+          filters:
+            - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, ,
+# 例如，对于 POST 请求 api.example.com/some/object/name，那么响应中 Location Header 的值 object-service.prod.example.net/v2/some/object/id
+# 会被重写为 api.example.com/some/object/id。
+# 详细案例可以参考：org.springframework.cloud.gateway.filter.factory.RewriteLocationResponseHeaderGatewayFilterFactory 类上的注释
 
 
 
