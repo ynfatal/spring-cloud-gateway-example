@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: rewrite_location_response_header_route
+    active: redirect_to_route
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -415,8 +415,8 @@ spring:
 #      NEVER_STRIP：即使原请求的路径不包含版本，也不会剥离版本。
 #      AS_IN_REQUEST：只有原请求的路径不包含版本时，才会剥离版本。
 #      ALWAYS_STRIP：版本始终被剥离，即使原请求的路径包含版本。
-#  - locationHeaderName：表示自定义的 Location header 名称。默认：Location。
-#  - hostValue：一个字符串。如果提供，将用于替换响应中 Location header 的 host:port 部分。默认：请求中 Host header 的值用于替换。
+#  - locationHeaderName：表示自定义的 Location 响应头的名称。默认为 Location。
+#  - hostValue：一个字符串。如果提供，将用于替换响应头中 Location 的 host:port 部分。默认使用请求头中 Host 的值来替换它。
 #  - protocolsRegex：一个有效的正则表达式字符串，协议名称必须与之匹配。如果不匹配，则过滤器不执行任何操作。默认值为 http|https|ftp|ftps。
 # 下面的示例配置了一个 RewriteLocationResponseHeader GatewayFilter：
 spring:
@@ -430,9 +430,10 @@ spring:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
             - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, ,
-# 例如，对于 POST 请求 api.example.com/some/object/name，那么响应中 Location Header 的值 object-service.prod.example.net/v2/some/object/id
+# 例如，对于 POST 请求 api.example.com/some/object/name，那么响应头中 Location 的值 object-service.prod.example.net/v2/some/object/id
 # 会被重写为 api.example.com/some/object/id。
 # 详细案例可以参考：org.springframework.cloud.gateway.filter.factory.RewriteLocationResponseHeaderGatewayFilterFactory 类上的注释
+# 注：重定向的时候，你可以在响应头上找到 Location。
 
 
 
