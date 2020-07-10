@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: save_session_route
+    active: secure_headers_route
 test:
   uri: http://httpbin.org:80
 
@@ -476,7 +476,30 @@ spring:
             - SaveSession
 # 如果你将 Spring Security 和 Spring Session 集成，并且希望确保安全细节已转发到远程进程，那么这一点至关重要。
 
-
+---
+##############  The SecureHeaders GatewayFilter Factory  ##############
+# SecureHeaders GatewayFilter Factory 可以向响应添加多个 header，具体可以参考
+#  源码：
+#   - org.springframework.cloud.gateway.filter.factory.SecureHeadersGatewayFilterFactory
+#   - org.springframework.cloud.gateway.filter.factory.SecureHeadersProperties
+#  官方文档：https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.2.RELEASE/reference/html/#the-secureheaders-gatewayfilter-factory
+# 目前暂不支持覆盖，参考方法：org.springframework.cloud.gateway.filter.factory.SecureHeadersGatewayFilterFactory.apply
+spring:
+  profiles: secure_headers_route
+  cloud:
+    gateway:
+      routes:
+        - id: secure_headers_route
+          uri: ${test.uri}
+          predicates:
+            - Path=/headers
+          filters:
+            - SecureHeaders
+      # 要禁用 SecureHeaders 的默认值，可以在这里设置，多个参数用逗号分隔。
+      filter:
+        secure-headers:
+          # 注意：要使用 SecureHeader 的小写全名来禁用它。
+          disable: x-frame-options, strict-transport-security
 
 
 

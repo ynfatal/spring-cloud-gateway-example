@@ -56,7 +56,7 @@ GET http://localhost:8080/foo/red/blue
 Accept: */*
 Cache-Control: no-cache
 
-### the test for RewriteResponseHeader GatewayFilter
+### the test for RewriteResponseHeader GatewayFilter and SecureHeaders GatewayFilter
 GET http://localhost:8080/headers
 Accept: */*
 Cache-Control: no-cache
