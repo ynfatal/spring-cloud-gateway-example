@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: rewrite_response_header_route
+    active: save_session_route
 test:
   uri: http://httpbin.org:80
 
@@ -454,13 +454,23 @@ spring:
           filters:
             - AddResponseHeader=X-Request-Foo, /42?user=ford&password=omg!what&flag=true
             - RewriteResponseHeader=X-Request-Foo, password=[^&]+, password=***
-# [^&]：表示除 & 之外的任何字符。
-# [^&]+：匹配所有字符，以 & 为结束标志。
 # 官网的配置示例和测试示例：
 #  - 配置：https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-core/src/test/resources/application.yml （line 287）
 #  - 测试：https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory/RewriteResponseHeaderGatewayFilterFactoryTests.java
 
-
+---
+##############  The SaveSession GatewayFilter Factory  ##############
+spring:
+  profiles: save_session_route
+  cloud:
+    gateway:
+      routes:
+        - id: save_session_route
+          uri: ${test.uri}
+          predicates:
+            - Path=/get
+          filters:
+            - SaveSession
 
 
 
