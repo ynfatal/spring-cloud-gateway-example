@@ -3,7 +3,9 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: redirect_to_route
+    active: rewrite_response_header_route
+test:
+  uri: http://httpbin.org:80
 
 ---
 ##########   The AddRequestHeader GatewayFilter Factory   ##########
@@ -15,7 +17,7 @@ spring:
     gateway:
       routes:
         - id: add_request_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           # 注意：filters 不能单独使用，必须在有 predicates 的前提下。参考属性标注的注解：org.springframework.cloud.gateway.route.RouteDefinition.predicates
           predicates:
             - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
@@ -46,7 +48,7 @@ spring:
     gateway:
       routes:
         - id: add_request_parameter_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
           filters:
@@ -62,7 +64,7 @@ spring:
     gateway:
       routes:
         - id: add_request_parameter_route_with_variable
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - Host=www.{segment}.com
           filters:
@@ -78,7 +80,7 @@ spring:
     gateway:
       routes:
         - id: add_response_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
           filters:
@@ -93,7 +95,7 @@ spring:
     gateway:
       routes:
         - id: add_response_header_route_with_variable
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - Host=www.{segment}.com
           filters:
@@ -109,7 +111,7 @@ spring:
     gateway:
       routes:
         - id: dedupe_response_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-06T05:22:13.128+08:00[Asia/Shanghai]
           filters:
@@ -217,7 +219,7 @@ spring:
     gateway:
       routes:
         - id: map_request_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
           filters:
@@ -253,7 +255,7 @@ spring:
     gateway:
       routes:
         - id: preserve_host_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-08T05:15:13.128+08:00[Asia/Shanghai]
           filters:
@@ -295,7 +297,7 @@ spring:
     gateway:
       routes:
         - id: request_rate_limiter_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-09T05:36:13.128+08:00[Asia/Shanghai]
           filters:
@@ -328,7 +330,7 @@ spring:
     gateway:
       routes:
         - id: redirect_to_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-09T08:29:13.128+08:00[Asia/Shanghai]
           filters:
@@ -344,7 +346,7 @@ spring:
     gateway:
       routes:
         - id: remove_request_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
@@ -364,7 +366,7 @@ spring:
     gateway:
       routes:
         - id: remove_response_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
@@ -425,7 +427,7 @@ spring:
     gateway:
       routes:
         - id: rewrite_location_response_header_route
-          uri: http://httpbin.org:80
+          uri: ${test.uri}
           predicates:
             - After=2020-07-09T09:17:13.128+08:00[Asia/Shanghai]
           filters:
@@ -435,8 +437,26 @@ spring:
 # 详细案例可以参考：org.springframework.cloud.gateway.filter.factory.RewriteLocationResponseHeaderGatewayFilterFactory 类上的注释
 # 注：重定向的时候，你可以在响应头上找到 Location。
 
-
-
+---
+##############  The RewriteResponseHeader GatewayFilter Factory  ##############
+# RewriteResponseHeader GatewayFilter factory 接收 name，regexp 和 replacement 三个参数。它使用Java正则表达式以一种灵活的方式重写响应头的值。
+# 下面的示例配置了一个 RewriteResponseHeader GatewayFilter：
+spring:
+  profiles: rewrite_response_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: rewrite_response_header_route
+          uri: ${test.uri}
+          predicates:
+            - Host=**.rewriteresponseheader.org
+            - Path=/headers
+          filters:
+            - AddResponseHeader=X-Request-Foo, /42?user=ford&password=omg!what&flag=true
+            - RewriteResponseHeader=X-Request-Foo, password=[^&]+, password=***
+# 官网的配置示例和测试示例：
+#  - 配置：https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-core/src/test/resources/application.yml （line 287）
+#  - 测试：https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory/RewriteResponseHeaderGatewayFilterFactoryTests.java
 
 
 
