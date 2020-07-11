@@ -641,3 +641,25 @@ spring:
                   factor: 2 # 用于计算后退间隔的被乘数，默认为 2
                   basedOnPreviousValue: false # 是否基于先前的值，默认为 true
 # 约定大于配置，一般默认的配置就好。直接使用快捷配置 - Retry 即可。
+
+---
+##############  The RequestSize GatewayFilter Factory  ##############
+# 当请求的大小大于允许的限制时，RequestSize GatewayFilter Factory 可以限制请求到达下游服务。过滤器采用 maxSize 参数，
+# maxSize 是 Datasize 类型的，因此可以将值定义为一个数字，后跟可选的数据单元后缀，如：“KB” 或 “MB”。字节单位默认是 “B”。
+# 它以字节为单位定义请求允许的大小限制。下面的示例配置了一个 RequestSize GatewayFilter：
+spring:
+  profiles: request_size_route
+  cloud:
+    gateway:
+      routes:
+        - id: request_size_route
+          uri: ${test.uri}
+          predicates:
+            - Path=/upload
+          filters:
+            - name: RequestSize
+              args:
+                # 如果未在路由的过滤器定义此参数，则默认请求大小限制为5MB。
+                maxSize: 5000000
+# 当请求因大小被拒绝时，RequestSize GatewayFilter Factory 将响应状态设置为 413 Payload Too Large，并带有额外的响应头 errorMessage。
+# 例如：`errorMessage : Request size is larger than permissible limit. Request size is 6.0 MB where permissible limit is 5.0 MB.`
