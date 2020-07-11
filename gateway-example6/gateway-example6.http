@@ -86,3 +86,13 @@ Cache-Control: no-cache
 Host: www.retry.com
 
 ###
+POST http://localhost:8080/post
+Content-Type: application/json
+Host: www.modifyarequestbody.org
+
+{
+  "message": "fatal"
+}
+
+
+###

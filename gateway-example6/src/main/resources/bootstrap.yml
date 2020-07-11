@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: retry_route
+    active: modify_a_request_body_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -663,3 +663,9 @@ spring:
                 maxSize: 5000000
 # 当请求因大小被拒绝时，RequestSize GatewayFilter Factory 将响应状态设置为 413 Payload Too Large，并带有额外的响应头 errorMessage。
 # 例如：`errorMessage : Request size is larger than permissible limit. Request size is 6.0 MB where permissible limit is 5.0 MB.`
+
+---
+##############  The Modify a Request Body GatewayFilter Factory  ##############
+# 你可以使用 ModifyRequestBody 过滤器来修改 request body，然后再由网关将其发送到下游（服务）。
+# 注意：这个过滤器只能通过 java 语言来配置。
+# 配置类位置：com.example.config.ModifyRequestBodyConfiguration
