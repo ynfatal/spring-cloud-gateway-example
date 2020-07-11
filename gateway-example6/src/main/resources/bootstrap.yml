@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: modify_a_request_body_route
+    active: modify_a_response_body_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -669,3 +669,8 @@ spring:
 # 你可以使用 ModifyRequestBody 过滤器来修改 request body，然后再由网关将其发送到下游（服务）。
 # 注意：这个过滤器只能通过 java 语言来配置。
 # 配置类位置：com.example.config.ModifyRequestBodyConfiguration
+
+---
+##############  The Modify a Response Body GatewayFilter Factory  ##############
+# 你可以使用 ModifyResponseBody 过滤器在将响应正文发送回客户端之前对其进行修改。
+# 注意：这个过滤器只能通过 java 语言来配置。

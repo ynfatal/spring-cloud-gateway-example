@@ -85,7 +85,7 @@ Accept: */*
 Cache-Control: no-cache
 Host: www.retry.com
 
-###
+### the test for ModifyRequestBody GatewayFilter
 POST http://localhost:8080/post
 Content-Type: application/json
 Host: www.modifyarequestbody.org
@@ -94,5 +94,10 @@ Host: www.modifyarequestbody.org
   "message": "fatal"
 }
 
+### the test for ModifyResponseBody GatewayFilter
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Host: www.modifyaresponsebody.org
 
 ###
