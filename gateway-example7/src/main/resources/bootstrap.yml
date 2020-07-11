@@ -1,6 +1,25 @@
+# GlobalFilter 接口具有与 GatewayFilter 接口相同的标签。这些特殊的过滤器，有条件的应用于所有的路由。
+# 当请求与路由匹配时，过滤web处理器会将 GlobalFilter 的所有实例和该路由的所有 GatewayFilter 添加都过滤器链中。
+# 这个组合的过滤器链按 org.springframework.core.Ordered 接口排序，你可以通过实现 getOrder() 方法来设置该接口。
+# 由于 Spring Cloud Gateway 区分过滤器逻辑执行的 “pre” 和 “post” 阶段（参见其工作原理），优先级最高的过滤器是
+# “pre” 阶段过滤器中的第一个，是 “post” 阶段过滤器中的最后一个。
 spring:
   profiles:
-    active: load_balance_client_route
+    active: custom_global_filter_route
+
+---
+##########  Combined Global Filter and GatewayFilter Ordering ##########
+# 全局过滤器和网关过滤器组合排序
+spring:
+  profiles: custom_global_filter_route
+  cloud:
+    gateway:
+      routes:
+        - id: custom_global_filter_route
+          uri: http://httpbin.org:80
+          predicates:
+            - After=2020-07-11T21:58:13.128+08:00[Asia/Shanghai]
+
 ---
 ##############  The LoadBalancerClient Filter  ##############
 # LoadBalancerClientFilter 在名为 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 的交换属性中查找 URI。如果 URL 有一个 lb 方案
