@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: set_request_header_route
+    active: strip_prefix_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -547,8 +547,54 @@ spring:
 # 参考上边三个类你会发现实现的功能是一样的，只不过 SetRequestHeader 是 Java 8 之后使用函数式编程实现的。
 # 结论是：功能没区别，实现有点差异。
 
+---
+##############  The SetResponseHeader GatewayFilter Factory  ##############
+# SetResponseHeader GatewayFilter Factory 接收两个参数：name，value。
+# 下面的示例配置了一个 SetResponseHeader GatewayFilter：
+spring:
+  profiles: set_response_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: set_response_header_route
+          uri: ${test.uri}
+          predicates:
+            - Host=www.{segment}.com
+          filters:
+            - SetResponseHeader=foo, bar-{segment}
+# 可以按上一个的方式找差异，结论是：功能没区别，实现有点差异。
 
+---
+##############  The SetStatus GatewayFilter Factory  ##############
+# SetStatus GatewayFilter Factory 接收单个参数 status。它必须是有效的 Spring HttpStatus，
+# 它的值可以是整数值 404，也可以是枚举的字符串表示 NOT_FOUND。
+# 下面的示例配置了一个 SetStatus GatewayFilter：
+spring:
+  profiles: set_status_route
+  cloud:
+    gateway:
+      routes:
+        - id: set_status_route
+          uri: ${test.uri}
+          predicates:
+            - After=2020-07-11T09:30:13.128+08:00[Asia/Shanghai]
+          filters:
+#            - SetStatus=BAD_REQUEST  # 支持 String 类型
+            - SetStatus=401  # 支持 int 类型
 
-
-
-
+---
+##############  The StripPrefix GatewayFilter Factory  ##############
+# StripPrefix GatewayFilter Factory 接收一个参数 parts。parts参数指示在将请求发送到下游之前要从
+# 请求中剥离的路径中的部件数。下面的示例配置了一个 StripPrefix GatewayFilter：
+spring:
+  profiles: strip_prefix_route
+  cloud:
+    gateway:
+      routes:
+        - id: strip_prefix_route
+          uri: ${test.local}
+          predicates:
+            - Path=/name/**
+          filters:
+            - StripPrefix=2 # 跳过两个部件
+# 当通过网关请求 /name/blue/red 时，对 nameservice 的请求看起来像 nameservice/red。

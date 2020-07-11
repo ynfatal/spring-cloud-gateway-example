@@ -67,8 +67,14 @@ GET http://localhost:8080/red/blue
 Accept: */*
 Cache-Control: no-cache
 
-### the test SetRequestHeader GatewayFilter
+### the test SetRequestHeader GatewayFilter, SetResponseHeader GatewayFilter and SetStatus GatewayFilter
 GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Host: www.fatal.com
+
+### the test for StripPrefix GatewayFilter
+GET http://localhost:8080/name/blue/red
 Accept: */*
 Cache-Control: no-cache
 Host: www.fatal.com
