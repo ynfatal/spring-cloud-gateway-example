@@ -79,4 +79,10 @@ Accept: */*
 Cache-Control: no-cache
 Host: www.fatal.com
 
+### the test for Retry GatewayFilter
+GET http://localhost:8080/get
+Accept: */*
+Cache-Control: no-cache
+Host: www.retry.com
+
 ###

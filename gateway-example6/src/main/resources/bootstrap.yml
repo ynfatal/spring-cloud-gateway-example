@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: strip_prefix_route
+    active: retry_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -598,3 +598,46 @@ spring:
           filters:
             - StripPrefix=2 # 跳过两个部件
 # 当通过网关请求 /name/blue/red 时，对 nameservice 的请求看起来像 nameservice/red。
+
+---
+##############  The Retry GatewayFilter Factory  ##############
+# Retry GatewayFilter Factory 支持以下参数：
+#  - retries：应该尝试的重试次数。
+#  - statuses：重试的 HttpStatus 状态码，用 Spring HttpStatus。
+#  - methods：重试的 Http 方法类型，用 Spring HttpMethod。
+#  - series：重试的 HttpStatus 状态码系列，用 Spring HttpStatus.Series。
+#  - exceptions：重试抛出的异常列表。
+#  - backoff：为重试配置的指数回退。在回退间隔为 firstBackoff * (factor ^ n) 后执行重试，其中 n 是迭代次数。如果配置了 maxBackoff，
+#      则应用的最大回退间隔限制为 maxBackoff。如果 basedOnPreviousValue 为 true，则使用 prevBackoff * factor 来计算回退间隔。如下：
+#      首次回退间隔：firstBackoff
+#      其他次数的回退间隔：（参考源码：reactor.retry.Backoff.exponential）
+#       - false：firstBackoff * (factor ^ n)，其中 n 是迭代次数。
+#       - true：prevBackoff * factor
+#      支持最大的回退间隔：maxBackoff
+# 如果启用，将为 Retry GatewayFilter 配置以下默认值：
+#  - retries：3次
+#  - series：5XX 系列
+#  - methods：GET method
+#  - exceptions：IOException 和 TimeoutException
+#  - backoff: 禁用。（没有默认值，BackoffConfig 为 null，就等于禁用咯）
+spring:
+  profiles: retry_route
+  cloud:
+    gateway:
+      routes:
+        - id: retry_route
+          uri: ${test.uri}
+          predicates:
+            - Host=*.retry.com
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 10ms # 首次回退间隔，默认为 5ms
+                  maxBackoff: 50ms # 最大回退间隔，无默认值
+                  factor: 2 # 用于计算后退间隔的被乘数，默认为 2
+                  basedOnPreviousValue: false # 是否基于先前的值，默认为 true
+# 约定大于配置，一般默认的配置就好。直接使用快捷配置 - Retry 即可。
