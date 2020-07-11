@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: modify_a_response_body_route
+    active: default_filters_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -674,3 +674,20 @@ spring:
 ##############  The Modify a Response Body GatewayFilter Factory  ##############
 # 你可以使用 ModifyResponseBody 过滤器在将响应正文发送回客户端之前对其进行修改。
 # 注意：这个过滤器只能通过 java 语言来配置。
+
+---
+######################     Default Filters    ######################
+# 要想指定的过滤器将应用于所有路由，可以使用 spring.cloud.gateway.default-filters 来指定它们。此属性接收
+# 一个过滤器列表。下面的示例配置了一组默认的过滤器：
+spring:
+  profiles: default_filters_route
+  cloud:
+    gateway:
+      default-filters:
+        - AddResponseHeader=X-Response-Default-Red, Default-Blue
+        - AddRequestHeader=X-Request-Default-Red, Default-Blue
+      routes:
+        - id: default_filters_route
+          uri: ${test.uri}
+          predicates:
+            - Path=/get
