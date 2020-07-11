@@ -3,7 +3,7 @@
 # 有关如何使用下面过滤器的更详细示例，请参考单元测试 -> https://github.com/spring-cloud/spring-cloud-gateway/tree/master/spring-cloud-gateway-core/src/test/java/org/springframework/cloud/gateway/filter/factory
 spring:
   profiles:
-    active: prefix_path_route
+    active: set_request_header_route
 test:
   uri: http://httpbin.org:80
   local: http://localhost:9090
@@ -520,6 +520,32 @@ spring:
             - SetPath=/{segment}
 # 用于请求路径为 /red/blue，发出下游请求之前将路径设置为 /blue
 
+---
+##############  The SetRequestHeader GatewayFilter Factory  ##############
+# SetRequestHeader GatewayFilter Factory 接收两个参数：name，value。
+# 下面的示例配置了一个 SetRequestHeader GatewayFilter：
+spring:
+  profiles: set_request_header_route
+  cloud:
+    gateway:
+      routes:
+        - id: set_request_header_route
+          uri: ${test.uri}
+          predicates:
+            - Host=www.{segment}.com
+          filters:
+            - SetRequestHeader=foo, bar-{segment}
+#  AddRequestHeader 与 SetRequestHeader 区别在于底层实现不同：
+#  - AddRequestHeader：org.springframework.http.server.reactive.ServerHttpRequest.Builder.header, java.util.Map.put
+#  - SetRequestHeader：org.springframework.http.server.reactive.ServerHttpRequest.Builder.headers, org.springframework.util.MultiValueMap.set
+# 官方对 header 方法的介绍是使用 headers 可以获得更好的控制。其实，说白了就是函数式编程好控制，实现方法可以在外边写。
+# 写 SetRequestHeaderGatewayFilterFactory 类好控制，而不是用这个工厂类的功能好控制。
+# 参考类：
+#  - org.springframework.cloud.gateway.filter.factory.AddRequestHeaderGatewayFilterFactory
+#  - org.springframework.cloud.gateway.filter.factory.SetRequestHeaderGatewayFilterFactory
+#  - org.springframework.http.server.reactive.DefaultServerHttpRequestBuilder
+# 参考上边三个类你会发现实现的功能是一样的，只不过 SetRequestHeader 是 Java 8 之后使用函数式编程实现的。
+# 结论是：功能没区别，实现有点差异。
 
 
 
