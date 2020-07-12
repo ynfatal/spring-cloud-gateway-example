@@ -31,20 +31,16 @@ public class GatewayConfiguration {
     @Bean
     public RouteLocator myRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
-            .route(p -> p
-                .path("/get")
+            .route(p -> p.path("/get").and().host("www.*.com")
                 .filters(f -> f.addRequestHeader("Hello", "World"))
-                .uri(HTTP_URI)
-            )
-            .route(p -> p
-                .host("*.hystrix.com")
+                .uri(HTTP_URI))
+            .route(p -> p.host("*.hystrix.com")
                 .filters(f -> f
                     .hystrix(config -> config
                         .setName("mycmd")
-                        .setFallbackUri("forward:/fallback")
-                    )
-                ).uri(HTTP_URI)
-            ).build();
+                        .setFallbackUri("forward:/fallback")))
+                .uri(HTTP_URI))
+            .build();
     }
 
 }
