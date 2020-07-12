@@ -10,8 +10,13 @@ GET http://localhost:8080/get
 Accept: */*
 Cache-Control: no-cache
 
-### the test for LoadBalancerClient Filter
+### the test for LoadBalancerClientFilter
 GET http://localhost:8080/service/load_balance
+Accept: */*
+Cache-Control: no-cache
+
+### the test for ReactiveLoadBalancerClientFilter
+GET http://localhost:8080/service/reactive_load_balance
 Accept: */*
 Cache-Control: no-cache
 

@@ -18,7 +18,12 @@ public class LoadBalanceController {
 
     @GetMapping("/load_balance")
     public String loadBalance() {
-        return String.format("Hello, Fatal! prot: %s", port);
+        return String.format("Hello, Fatal! port: %s", port);
+    }
+
+    @GetMapping("/reactive_load_balance")
+    public String reactiveLoadBalance() {
+        return String.format("Hello, Fatal! port: %s", port);
     }
 
 }

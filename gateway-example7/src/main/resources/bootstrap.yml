@@ -5,7 +5,7 @@
 # “pre” 阶段过滤器中的第一个，是 “post” 阶段过滤器中的最后一个。
 spring:
   profiles:
-    active: custom_global_filter_route
+    active: reactive_load_balance_client_route
 
 ---
 ##########  Combined Global Filter and GatewayFilter Ordering ##########
@@ -22,17 +22,18 @@ spring:
 
 ---
 ##############  Forward Routing Filter   ##############
-# ForwardRoutingFilter 在名为 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 的 exchange 属性中查找 URI。如果 URL 有一个
+# ForwardRoutingFilter 在 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中查找 URI。如果 URL 有一个
 # forward 模式（例如 `forward:///localendpoint`），它将使用 Spring DispatcherHandler 来处理请求。请求 URL 的路径部分
 # 被转发 URL 中的路径覆盖。未修改的原始 URL 会附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。
 # 从 ForwardRoutingFilter 可以看出，里边还没实现好具体逻辑。
 
 ---
 ##############  The LoadBalancerClient Filter  ##############
-# LoadBalancerClientFilter 在名为 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 的 exchange 属性中查找 URI。如果 URL 有一个 lb 方案
+# LoadBalancerClientFilter 在 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中查找 URI。如果 URL 有一个 lb 方案
 #（比如：lb://myservice），它使用 Spring Cloud LoadBalancerClient 将名称（在本例中是 fatal-service）解析为一个实际的主机和端口，
-# 并替换相同属性的 URI。未修改的原始 URL 被附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。过滤器还会
+# 并替换该属性的 URI。未修改的原始 URL 被附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。过滤器还会
 # 查看 ServerWebExchangeUtils.GATEWAY_SCHEME_PREFIX_ATTR 属性是否等于 lb。如果是，则应用相同的规则。
+# 注：该过滤已弃用，取而代之的是 ReactiveLoadBalancerClientFilter
 # 下面的示例配置了一个 LoadBalancerClientFilter：
 spring:
   profiles: load_balance_client_route
@@ -49,3 +50,37 @@ spring:
       # 默认情况下，当在 LoadBalance 中找不到服务实例时，将返回 503。通过设置 spring.cloud.gateway.loadbalancer.use404=true，可以将网关配置为返回 404。
       loadbalancer:
         use404: true
+# 我们来看下 LoadBalancerClientFilter 和 ReactiveLoadBalancerClientFilter 的自动配置类：
+#  - org.springframework.cloud.gateway.config.GatewayLoadBalancerClientAutoConfiguration
+#  - org.springframework.cloud.gateway.config.GatewayReactiveLoadBalancerClientAutoConfiguration
+# 对比两边的相关配置信息，你可以发现 LoadBalancerClientFilter 是基于 RibbonAutoConfiguration 开启的，而 ReactiveLoadBalancerClientFilter
+# 是基于 LoadBalancerAutoConfiguration 开启的。
+# 结论：
+#   - 负载均衡使用 Ribbon，那么对应使用 LoadBalancerClientFilter。
+#   - 负载均衡使用 LoadBalancer，那么对应使用 ReactiveLoadBalancerClientFilter。
+#   - 默认集成的是 Ribbon，所以这里用的是 LoadBalancerClientFilter。想要改成 LoadBalancer，看下个案例。
+
+---
+##############  The ReactiveLoadBalancerClientFilter  ##############
+# ReactiveLoadBalancerClientFilter 在 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中查找 URI。如果 URL 有一个 lb 方案
+#（比如：lb://myservice），它使用 Spring Cloud ReactiveLoadBalancerClient 将名称（在本例中是 fatal-service）解析为一个实际的主机和端口，
+# 并替换该属性的 URI。未修改的原始 URL 被附加到 ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR 属性的列表中。过滤器还会
+# 查看 ServerWebExchangeUtils.GATEWAY_SCHEME_PREFIX_ATTR 属性是否等于 lb。如果是，则应用相同的规则。
+# 下面的示例配置了一个 ReactiveLoadBalancerClientFilter：
+spring:
+  profiles: reactive_load_balance_client_route
+  cloud:
+    gateway:
+      routes:
+        - id: reactive_load_balance_client_route
+          uri: lb://fatal-service
+          predicates:
+            - Path=/service/**
+      # 默认情况下，当在 ReactiveLoadBalance 中找不到服务实例时，将返回 503。通过设置 spring.cloud.gateway.loadbalancer.use404=true，可以将网关配置为返回 404。
+      loadbalancer:
+        use404: true
+    # 关闭 Ribbon ，负载均衡组件实现换成 LoadBalancer
+    loadbalancer:
+      ribbon:
+        enabled: false
+
