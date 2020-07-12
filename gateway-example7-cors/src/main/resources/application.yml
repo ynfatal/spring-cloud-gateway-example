@@ -1,0 +1,17 @@
+server:
+  port: 8888
+# 测试方式：
+# 1. 将 gateway-example7-service 的 bootstrap.yml 第 162-168 行的配置注释掉
+# 2. 启动 gateway-eureka-server、gateway-example7-service、gateway-example7-cors
+# 3. 然后浏览器访问 http://localhost:8888/cors.html
+# 4. 打开 f12，选择 Console
+# 5. 点击按钮发送请求
+# 6. 你会在看到控制台打印
+# Access to XMLHttpRequest at 'http://localhost:8080/cors' from origin
+# 'http://localhost:8888' has been blocked by CORS policy:
+# No 'Access-Control-Allow-Origin' header is present on the requested resource.
+# 跨域问题模拟成功
+
+# 接下来是解决方案
+# 1. 将 gateway-example7-service 的 bootstrap.yml 第 162-168 行的配置打开
+# 2. 重启 gateway-example7-service，再次执行上边 3-6 的操作即可看到结果

@@ -5,7 +5,7 @@
 # “pre” 阶段过滤器中的第一个，是 “post” 阶段过滤器中的最后一个。
 spring:
   profiles:
-    active: reactive_load_balance_client_route
+    active: cors_configuration_route
 
 ---
 ##########  Combined Global Filter and GatewayFilter Ordering ##########
@@ -147,3 +147,33 @@ spring:
 # 您可以使用一些方便的方法将 exchange 标记为 “routed” 或检查是否已经被路由。
 #  - ServerWebExchangeUtils.isAlreadyRouted 接收一个 ServerWebExchange 对象，并检查是否已经被标记 “routed”
 #  - ServerWebExchangeUtils.setAlreadyRouted 接收一个 ServerWebExchange 对象，并将其标记为 “routed”
+
+---
+######################    CORS Configuration    ######################
+# 你可以通过配置网关来控制 CORS 行为。“全局” CORS 配置是 URL 模式到 Spring Framework CorsConfiguration 的映射。
+# 下面的示例配置了 CORS：
+spring:
+  profiles: cors_configuration_route
+  cloud:
+    gateway:
+      routes:
+        - id: cors_configuration_route
+          uri: http://localhost:9090
+          predicates:
+            - Path=/cors
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            maxAge: 10
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+# 在本示例中，CORS 请求允许来自任所有域的所有 GET 请求路径。要为某些网关路由谓词未处理的请求 提供相同的 CORS 配置，
+# 请设置 spring.cloud.gateway.globalcors.add-to-simple-url-handler-mapping 为 true。
+# - '[/**]'： path pattern（路径模式），/** 为路径模式值。
+# - maxAge：客户端可以缓存 pre-flight 请求响应的持续时间。
+# - allowedOrigins：设置允许的起源，如："https://domain1.com"。
+#                   特殊值"*"允许所有域。
+# - allowedMethods：设置 HTTP 方法，例如允许 "GET" "POST" "PUT" 等等。
+#                   特殊值"*"允许所有方法。
+#                   默认只有"GET"和"HEAD"是允许的。
