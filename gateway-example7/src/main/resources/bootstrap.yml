@@ -84,3 +84,66 @@ spring:
       ribbon:
         enabled: false
 
+---
+##############  The Netty Routing Filter  ##############
+# 如果位于 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中的 URL 具有 “http” 或 “https” 方案，NettyRoutingFilter 就会
+# 运行。它使用 Netty HttpClient 来发出下游代理请求，响应被放在 exchange 的 ServerWebExchangeUtils.CLIENT_RESPONSE_ATTR 属性中， 在后面的
+# 过滤器中使用。（还有一个实验性的 WebClientHttpRoutingFilter，它执行同样的功能，但不需要 Netty）
+
+---
+##############   The Netty Write Response Filter  ##############
+# 如果 Netty HttpClientResponse 在 exchange 的 ServerWebExchangeUtils.CLIENT_RESPONSE_ATTR 属性中，那么 NettyWriteResponseFilter 就会运行。
+# 它在所有过滤器完成任务之后运行，并将代理响应写回网关客户端响应。（还有一个实验性的 WebClientWriteResponseFilter，它执行同样的功能，但不需要 Netty）
+
+---
+##############   The RouteToRequestUrl Filter   ##############
+# 如果 exchange 的 ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR 属性中有 Route 对象，那么就会运行 RouteToRequestUrlFilter。它基于请求的 URI
+# 创建一个新的 URI，并使用 Route 对象的 URI 对其进行更新，新的 URI 放在 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中。
+# 如果 URI 有个 scheme 前缀，比如 lb:ws://serviceid，那么 lb scheme 将从 URI 中剥离出来，并被放在 exchange 的
+# ServerWebExchangeUtils.GATEWAY_SCHEME_PREFIX_ATTR 属性中，在后面的过滤器中使用。
+
+---
+##############   The Websocket Routing Filter   ##############
+# 如果位于 exchange 的 ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR 属性中的 URL 具有 “ws” 或 “wss” 方案，那么 WebsocketRoutingFilter 就会运行。
+# 它使用了 Spring WebSocket 基础设施将 WebSocket 转发到下游。你可以用过在 URI 上添加前缀 lb（例如 lb:ws://serviceid） 实现 websockets 负载均衡。
+# 如果使用 SockJS 作为普通 HTTP 的回退，则应该配置普通 HTTP路由 和 websocket路由。
+# 下面的示例配置了一个 WebsocketRoutingFilter：
+spring:
+  profiles: sockjs_fallback_route
+  cloud:
+    gateway:
+      routes:
+        # SockJS route
+        - id: websocket_sockjs_route
+          uri: http://localhost:9090
+          predicates:
+            - Path=/websocket/info/**
+        # Normal Websocket route
+        - id: websocket_route
+          uri: ws://localhost:9090
+          predicates:
+            - Path=/websocket/**
+# 可以参考这个案例：https://github.com/spring-cloud/spring-cloud-gateway/blob/master/spring-cloud-gateway-sample/src/main/resources/application.yml
+
+---
+###############   The Gateway Metrics Filter    ###############
+# 要启用 Gateway Metrics（度量标准；指标），请添加 spring-boot-starter-actuator 依赖。然后，默认情况下，
+# spring.cloud.gateway.metrics.enabled 设置为 true 时运行 Gateway Metrics Filter。此过滤器添加一个
+# 名为 `gateway.requests` 的计时器指标。带有以下标签的请求：
+#  - routeId: 路由ID
+#  - routeUri: API 路由到的 URI
+#  - outcome: 结果，按照 HttpStatus.Series 分类
+#  - status: 返回客户端的请求的 HTTP 状态
+#  - httpStatusCode: 返回客户端的请求的 HTTP 状态码
+#  - httpMethod: HTTP 请求方式（GET，POST 之类的）
+# 这些指标可以从 `/actuator/metrics/gateway.requests` 中取。可以很容易的和 Prometheus（普罗米修斯） 继承，从而创建一个
+# Grafana 仪表盘。
+# 注：要启用 Prometheus endpoint，请添加 micrometer-registry-prometheus 依赖。
+
+---
+###############   Marking An Exchange As Routed   ###############
+# 在网关路由了一个 ServerWebExchange 之后，它通过将 gatewayAlreadyRouted  添加到 exchange 属性中，将
+# 该 exchange 标记为 “routed”。一旦一个请求被标记为 “routed”，其它路由过滤器将不会再路由该请求，基本上跳过这些过滤器。
+# 您可以使用一些方便的方法将 exchange 标记为 “routed” 或检查是否已经被路由。
+#  - ServerWebExchangeUtils.isAlreadyRouted 接收一个 ServerWebExchange 对象，并检查是否已经被标记 “routed”
+#  - ServerWebExchangeUtils.setAlreadyRouted 接收一个 ServerWebExchange 对象，并将其标记为 “routed”
